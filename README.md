@@ -4,17 +4,16 @@
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![tests](https://github.com/billwallis/bills-sql-lineage/actions/workflows/tests.yaml/badge.svg)](https://github.com/billwallis/bills-sql-lineage/actions/workflows/tests.yaml)
 [![coverage](coverage.svg)](https://github.com/dbrgn/coverage-badge)
-[![GitHub last commit](https://img.shields.io/github/last-commit/billwallis/bills-sql-lineage)](https://shields.io/badges/git-hub-last-commit)
 
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/billwallis/bills-sql-lineage/main.svg)](https://results.pre-commit.ci/latest/github/billwallis/bills-sql-lineage/main)
+[![GitHub last commit](https://img.shields.io/github/last-commit/billwallis/bills-sql-lineage)](https://shields.io/badges/git-hub-last-commit)
 
 </div>
 
 ---
 
-# SQL Lineage 🔀
+# Bill's SQL Lineage 🔀
 
 Personal SQL lineage generator.
 
@@ -109,3 +108,12 @@ graph TD
 ```
 
 Note that the `final` node is an alias for the final `SELECT` statement since the final `SELECT` statement is not a CTE.
+
+## Contributing
+
+Quick start:
+
+```shell
+uv sync --all-groups
+pre-commit install --install-hooks
+```
