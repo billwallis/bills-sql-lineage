@@ -15,7 +15,7 @@ Nodes = list[str]
 Edges = list[tuple[str, str]]  # Directed edges, source --> target.
 
 
-def _parse_ctes(sql: str, dialect: str | None = None) -> [Nodes, Edges]:
+def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
     """
     Parse an SQL query into nodes and edges based on CTEs.
     """

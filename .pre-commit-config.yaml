@@ -1,7 +1,11 @@
+# yaml-language-server: $schema=https://json.schemastore.org/pre-commit-config.json
 ---
 ci:
   autoupdate_schedule: quarterly
-  skip: ["identity", "uv-lock", "pytest", "coverage-badge"]
+  skip: ["identity", "uv-lock", "ty", "pytest", "coverage-badge"]
+
+default_install_hook_types: ["pre-commit", "pre-push"]
+default_stages: ["pre-commit"]
 
 repos:
   - repo: meta
@@ -30,6 +34,14 @@ repos:
         name: Check TOML files are valid and parseable
       - id: check-ast
         name: Validate Python
+      - id: detect-private-key
+        name: Check for the existence of private keys
+
+  - repo: https://github.com/pre-commit-ci/pre-commit-ci-config
+    rev: v1.6.1
+    hooks:
+      - id: check-pre-commit-ci-config
+        name: Validate pre-commit CI config
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.8.23
@@ -40,30 +52,41 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.13.3
     hooks:
-      - id: ruff
+      - id: ruff-check
         name: Lint Python code
         args: ["--fix"]
       - id: ruff-format
         name: Format Python code
 
-  - repo: https://github.com/billwallis/bills-hooks
-    rev: v0.0.5
+  # https://github.com/astral-sh/ty?tab=readme-ov-file#getting-started
+  - repo: local
     hooks:
-      - id: pre-commit-validate
-      - id: tidy-gitkeep
+      - id: ty
+        name: Run type checks
+        entry: uvx ty check
+        language: system
+        pass_filenames: true
+        always_run: false
 
-  # Testing and coverage
+  - repo: https://github.com/billwallis/bills-hooks
+    rev: v0.0.6
+    hooks:
+      - id: tidy-gitkeep
+        name: Remove redundant .gitkeep files
+
   - repo: local
     hooks:
       - id: pytest
         name: Run unit tests
         entry: pytest tests --quiet
+        stages: ["pre-push"]
         language: system
         pass_filenames: false
         always_run: true
       - id: coverage-badge
         name: Generate coverage badge
         entry: coverage-badge -o coverage.svg -f
+        stages: ["pre-push"]
         language: system
         pass_filenames: false
         always_run: true
