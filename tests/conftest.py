@@ -4,6 +4,7 @@ Shared fixtures for tests.
 
 import datetime
 import pathlib
+from typing import Any
 
 import pytest
 
@@ -18,7 +19,7 @@ def read_fixture(fixture_name: str) -> str:
 def mock_datetime(monkeypatch):
     class MockDatetime(datetime.datetime):
         @classmethod
-        def now(cls, **kwargs):
+        def now(cls, **kwargs: Any) -> datetime.datetime:
             return datetime.datetime(2024, 1, 1)
 
     monkeypatch.setattr(datetime, "datetime", MockDatetime)
