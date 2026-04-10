@@ -10,7 +10,7 @@ version = "0.0.5"
 description = "Personal SQL lineage generator."
 authors = [{name = "billwallis"}]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "arguably>=1.2.5",
     "sqlglot[rs]>=26.12.1",
@@ -21,12 +21,12 @@ lineage = 'sql_lineage.__main__:app'
 
 [dependency-groups]
 dev = [
-    "coverage-badge>=1.1.0",
-    "pre-commit>=4.1.0",
+    "poethepoet>=0.42.1",
+    "pre-commit>=4.5.1",
 ]
 test = [
-    "pytest>=8.4.1",
-    "pytest-cov>=6.2.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]
 
 
@@ -35,7 +35,7 @@ packages = ["sql_lineage"]
 
 
 [tool.uv]
-required-version = ">=0.7,<1.0"
+required-version = ">=0.8"
 
 
 [[tool.uv.index]]
@@ -43,6 +43,42 @@ name = "testpypi"
 url = "https://test.pypi.org/simple/"
 publish-url = "https://test.pypi.org/legacy/"
 explicit = true
+
+
+[tool.poe]
+verbosity = -1
+envfile.optional = ".env"
+
+[tool.poe.tasks]
+install.shell = """
+    uv sync --all-groups --refresh
+    uv run pre-commit install --install-hooks
+"""
+upgrade.shell = """
+    uv sync --refresh --upgrade
+    uv run pre-commit autoupdate
+"""
+test = "uv run pytest -vvv"
+
+[tool.poe.tasks.lint]
+control.expr = "sys.platform"
+
+[[tool.poe.tasks.lint.switch]]
+case = "win32"
+shell = """
+    echo '=== pre-commit checks ==='
+    SKIP=identity uv run pre-commit run --all-files --hook-stage pre-commit
+    echo '=== pre-push checks ==='
+    SKIP=identity uv run pre-commit run --all-files --hook-stage pre-push
+"""
+
+[[tool.poe.tasks.lint.switch]]
+shell = """
+    echo '\\033[0;34mpre-commit checks\\033[0m'
+    SKIP=identity uv run pre-commit run --all-files --hook-stage pre-commit
+    echo '\\033[0;34mpre-push checks\\033[0m'
+    SKIP=identity uv run pre-commit run --all-files --hook-stage pre-push
+"""
 
 
 [tool.pytest.ini_options]
@@ -57,7 +93,7 @@ omit = ["__main__.py"]
 [tool.ruff]
 line-length = 80
 indent-width = 4
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.format]
 quote-style = "double"
@@ -66,8 +102,25 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.ruff.lint]
-select = ["F", "I", "N", "PL", "R", "RUF", "S", "UP", "W"]
-ignore = []
+select = [
+    "ANN",   # flake8-annotations
+    "B",     # flake8-bugbear
+    "E",     # pycodestyle-error
+    "F",     # Pyflakes
+    "FURB",  # refurb
+    "I",     # isort
+    "N",     # pep8-naming
+    "PL",    # Pylint
+    "PERF",  # Perflint
+    "RUF",   # Ruff-specific
+    "S",     # flake8-bandit
+    "UP",    # pyupgrade
+    "W",     # pycodestyle-warning
+]
+ignore = [
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
+    "E501",    # Line too long
+]
 fixable = ["ALL"]
 unfixable = []
 # Allow unused variables when underscore-prefixed
@@ -76,7 +129,9 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 # https://github.com/astral-sh/ruff/issues/4368
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/**/*.py" = [
-    "S101",    #  Use of `assert` detected
-    "PLR2004", #  Magic value used in comparison
-    "PLR0913", #  Too many arguments in function definition
+    "ANN001",   # Missing type annotation for function argument
+    "ANN201",   # Missing return type annotation for public function
+    "S101",     # Use of `assert` detected
+    "PLR2004",  # Magic value used in comparison
+    "PLR0913",  # Too many arguments in function definition
 ]
