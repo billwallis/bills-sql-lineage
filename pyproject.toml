@@ -1,5 +1,4 @@
 # yaml-language-server: $schema=https://json.schemastore.org/pyproject.json
-
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
@@ -10,10 +9,15 @@ version = "0.0.5"
 description = "Personal SQL lineage generator."
 authors = [{name = "billwallis"}]
 readme = "README.md"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = [
-    "arguably>=1.2.5",
-    "sqlglot[rs]>=26.12.1",
+    "arguably>=1.3.0",
+    # TODO: The parser improves in v28+ so that the current approch of
+    #       walking CTEs finds _all_ downstream CTEs, not just the immediate
+    #       downstream CTEs. To increase the version, the CTE walking first
+    #       needs to be updated.
+    "sqlglot[c]>=27.0.0,<28.0.0",
 ]
 
 [project.scripts]
@@ -21,21 +25,18 @@ lineage = 'sql_lineage.__main__:app'
 
 [dependency-groups]
 dev = [
-    "poethepoet>=0.42.1",
-    "pre-commit>=4.5.1",
+    "poethepoet>=0.46.0",
+    "pre-commit>=4.6.0",
 ]
 test = [
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
+    "coverage>=7.13.5",
+    "covdefaults>=2.3.0",
+    "pytest>=9.0.3",
 ]
 
 
 [tool.setuptools]
 packages = ["sql_lineage"]
-
-
-[tool.uv]
-required-version = ">=0.8"
 
 
 [[tool.uv.index]]
@@ -58,7 +59,11 @@ upgrade.shell = """
     uv sync --refresh --upgrade
     uv run pre-commit autoupdate
 """
-test = "uv run pytest -vvv"
+test.shell = """
+    uv run coverage run -m pytest -vvv
+    uv run coverage report --no-skip-covered
+    uv run coverage xml --quiet
+"""
 
 [tool.poe.tasks.lint]
 control.expr = "sys.platform"
@@ -82,12 +87,15 @@ shell = """
 
 
 [tool.pytest.ini_options]
-addopts = "--cov=sql_lineage --cov-fail-under=80"
 testpaths = ["tests"]
 
-
-[tool.coverage.run]
-omit = ["__main__.py"]
+[tool.coverage]
+run.plugins = ["covdefaults"]  # https://youtu.be/70T6OxKwxm0
+report.fail_under = 80
+report.exclude_lines = [
+    "@pytest.mark.skip",
+    "@pytest.mark.xfail",
+]
 
 
 [tool.ruff]
