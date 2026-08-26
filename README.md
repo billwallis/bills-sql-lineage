@@ -7,6 +7,7 @@
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/billwallis/bills-sql-lineage/main.svg)](https://results.pre-commit.ci/latest/github/billwallis/bills-sql-lineage/main)
 [![GitHub last commit](https://img.shields.io/github/last-commit/billwallis/bills-sql-lineage)](https://shields.io/badges/git-hub-last-commit)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/bills-sql-lineage)](https://shields.io/badges/py-pi-downloads)
 
 </span>
 
