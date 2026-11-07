@@ -19,6 +19,7 @@ def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
     """
     Parse an SQL query into nodes and edges based on CTEs.
     """
+
     nodes, edges = [], []
     parsed = sqlglot.parse_one(sql, dialect=dialect)
     with contextlib.suppress(Exception):
@@ -43,6 +44,7 @@ def _to_mermaid(nodes: Nodes, edges: Edges) -> str:
     """
     Convert nodes and edges into a Mermaid graph.
     """
+
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mermaid = f"%% Generated at {now}\nflowchart TD\n"
 
@@ -59,6 +61,7 @@ def sql_to_mermaid(sql: str, dialect: str | None = None) -> str:
     """
     Convert an SQL query into a Mermaid graph.
     """
+
     nodes, edges = _parse_ctes(sql, dialect)
 
     return _to_mermaid(nodes, edges)

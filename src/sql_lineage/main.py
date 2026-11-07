@@ -15,6 +15,7 @@ def _to_path(file_path: str, validate: bool = False) -> pathlib.Path:
     """
     Convert a file path to a pathlib.Path object.
     """
+
     path = pathlib.Path(file_path)
     if validate:
         if not path.exists():
@@ -42,6 +43,7 @@ def main(
     :param dialect: The SQL dialect to use. If not provided, SQLGlot will
         attempt to infer the dialect.
     """
+
     file_path = _to_path(file, validate=True)
     target_path = (
         _to_path(target) if target else file_path.with_suffix(".mermaid")
