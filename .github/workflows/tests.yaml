@@ -24,4 +24,7 @@ jobs:
         run: pip install --editable . --group test
 
       - name: ✅ Run unit tests
-        run: pytest -vvv --color yes
+        run: |
+          coverage run -m pytest -vvv --color yes
+          coverage report --no-skip-covered --include 'tests/*' --fail-under 100
+          coverage report --no-skip-covered --include 'src/*'
