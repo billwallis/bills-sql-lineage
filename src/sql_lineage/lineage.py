@@ -29,7 +29,7 @@ def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
         edges.extend((tbl.name, cte.alias) for tbl in cte.find_all(exp.Table))
 
     parsed.args["with"] = None  # Dirty hack to remove the CTEs from the query
-    final = "final" if "final" not in nodes else "final_"
+    final = "."
     nodes.append(final)
     edges.extend((tbl.name, final) for tbl in parsed.find_all(exp.Table))
 
