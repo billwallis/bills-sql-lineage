@@ -59,16 +59,22 @@ repos:
 
   - repo: local
     hooks:
-      - id: check-pyproject
+      - <<: &check-jsonschema-config
+          entry: check-jsonschema
+          pass_filenames: true
+          language: python
+          additional_dependencies: ["check-jsonschema==0.39.0"]
+          # This calls a remote URL, so run on pre-push to avoid slowing down commits
+          stages: ["pre-push"]
+        id: check-pyproject
         name: Validate pyproject.toml schema
-        entry: check-jsonschema
-        args: ["--schemafile", "https://json.schemastore.org/pyproject.json"]
         files: pyproject.toml
-        pass_filenames: true
-        language: python
-        additional_dependencies: ["check-jsonschema==0.39.0"]
-        # This calls a remote URL, so run on pre-push to avoid slowing down commits
-        stages: ["pre-push"]
+        args: ["--schemafile", "https://json.schemastore.org/pyproject.json"]
+      - <<: *check-jsonschema-config
+        id: check-dependabot-hooks
+        name: Validate dependabot.yml schema
+        files: dependabot.ya?ml
+        args: ["--schemafile", "https://json.schemastore.org/dependabot-2.0.json"]
 
   - repo: local
     hooks:
