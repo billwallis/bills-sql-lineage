@@ -1,7 +1,3 @@
-"""
-Shared fixtures for tests.
-"""
-
 import datetime
 import pathlib
 from typing import Any
