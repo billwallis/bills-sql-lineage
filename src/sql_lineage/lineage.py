@@ -1,7 +1,3 @@
-"""
-Parsers for SQL queries and Mermaid graphs.
-"""
-
 from __future__ import annotations
 
 import contextlib

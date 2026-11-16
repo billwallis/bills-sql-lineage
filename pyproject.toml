@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bills-sql-lineage"
-version = "0.0.6"
+version = "0.0.7"
 description = "Personal SQL lineage generator."
 authors = [{name = "billwallis"}]
 maintainers = [{name = "billwallis"}]
@@ -24,7 +24,6 @@ classifiers = [
     "Programming Language :: Python :: 3.15",
 ]
 dependencies = [
-    "arguably>=1.3.0",
     # TODO: The parser improves in v28+ so that the current approch of
     #       walking CTEs finds _all_ downstream CTEs, not just the immediate
     #       downstream CTEs. To increase the version, the CTE walking first
@@ -33,7 +32,7 @@ dependencies = [
 ]
 
 [project.scripts]
-lineage = 'sql_lineage.__main__:app'
+lineage = "sql_lineage.main:main"
 
 [dependency-groups]
 dev = [
