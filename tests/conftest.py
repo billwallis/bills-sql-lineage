@@ -23,7 +23,7 @@ def mock_datetime(monkeypatch):
 
 @pytest.fixture(
     scope="session",
-    params=["mock-1", "mock-2"],
+    params=["mock-1", "mock-2", "mock-3"],
 )
 def sql_mermaid_pair(request: pytest.FixtureRequest) -> tuple[str, str]:
     sql = read_fixture(f"{request.param}.sql")
