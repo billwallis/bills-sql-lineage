@@ -90,12 +90,13 @@ from ccc
 ...the following Mermaid diagram will be generated:
 
 ```mermaid
-graph TD
-    aaa
-    bbb
-    ccc
-    ddd
-    .
+flowchart TD
+    aaa{{"aaa"}}
+    bbb{{"bbb"}}
+    ccc["ccc"]
+    ddd["ddd"]
+    .(("•"))
+
     aaa --> ccc
     aaa --> ddd
     bbb --> ddd
@@ -103,7 +104,7 @@ graph TD
     ddd --> .
 ```
 
-Note that the `.` node represents the final `SELECT` statement since the final `SELECT` statement is not a CTE.
+Note that the `•` node represents the final `select` statement since the final `select` statement is not a CTE.
 
 ## Contributing
 

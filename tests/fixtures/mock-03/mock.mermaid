@@ -1,0 +1,10 @@
+%% Generated at 2024-01-01 00:00:00
+flowchart TD
+    used_cte["used_cte"]
+    database.schema.table{{"database.schema.table"}}
+    dead_cte(("dead_cte"))
+    .(("•"))
+
+    database.schema.table --> used_cte
+    used_cte --> dead_cte
+    used_cte --> .

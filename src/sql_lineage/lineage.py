@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+from typing import Literal
 
 import sqlglot
 from sqlglot import exp
@@ -9,7 +10,11 @@ from sqlglot.optimizer import qualify
 
 Nodes = list[str]
 Edges = list[tuple[str, str]]  # Directed edges, source --> target.
+NodeType = Literal["root"] | Literal["internal vertex"] | Literal["leaf"]
+SemanticNodes = list[tuple[str, NodeType]]
 
+OUTER_QUERY_VALUE = "."
+OUTER_QUERY_LABEL = "•"
 
 
 def _qualify_table(table: exp.Table) -> str:
@@ -38,16 +43,27 @@ def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
             edges.append((tbl_identifier, cte.alias))
 
     parsed.args["with"] = None  # Dirty hack to remove the CTEs from the query
-    final = "."
-    nodes.append(final)
+    nodes.append(OUTER_QUERY_VALUE)
     edges.extend(
-        (_qualify_table(tbl), final) for tbl in parsed.find_all(exp.Table)
+        (_qualify_table(tbl), OUTER_QUERY_VALUE)
+        for tbl in parsed.find_all(exp.Table)
     )
 
     return nodes, edges
 
 
-def _to_mermaid(nodes: Nodes, edges: Edges) -> str:
+def _format_node(node: str, node_type: NodeType) -> str:
+    if node == OUTER_QUERY_VALUE:
+        return f'{node}(("{OUTER_QUERY_LABEL}"))'
+    elif node_type == "root":
+        return f'{node}{{{{"{node}"}}}}'
+    elif node_type == "leaf":
+        return f'{node}(("{node}"))'
+    else:
+        return f'{node}["{node}"]'
+
+
+def _to_mermaid(nodes: SemanticNodes, edges: Edges) -> str:
     """
     Convert nodes and edges into a Mermaid graph.
     """
@@ -55,13 +71,35 @@ def _to_mermaid(nodes: Nodes, edges: Edges) -> str:
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mermaid = f"%% Generated at {now}\nflowchart TD\n"
 
-    for node in nodes:
-        mermaid += f"    {node}\n"  # pylint: disable=consider-using-join
+    for node, node_type in nodes:
+        mermaid += f"    {_format_node(node, node_type)}\n"
 
+    mermaid += f"\n"
     for edge in edges:
         mermaid += f"    {edge[0]} --> {edge[1]}\n"
 
     return mermaid
+
+
+def _get_semantic_nodes(nodes: Nodes, edges: Edges) -> SemanticNodes:
+    semantic_nodes = []
+    nodes_with_parents = set()
+    nodes_with_children = set()
+
+    for parent, child in edges:
+        nodes_with_parents.add(child)
+        nodes_with_children.add(parent)
+
+    for node in nodes:
+        # `root` takes precedence over `leaf` for single-node trees
+        if node not in nodes_with_parents:
+            semantic_nodes.append((node, "root"))
+        elif node not in nodes_with_children:
+            semantic_nodes.append((node, "leaf"))
+        else:
+            semantic_nodes.append((node, "internal vertex"))
+
+    return semantic_nodes
 
 
 def sql_to_mermaid(sql: str, dialect: str | None = None) -> str:
@@ -70,5 +108,6 @@ def sql_to_mermaid(sql: str, dialect: str | None = None) -> str:
     """
 
     nodes, edges = _parse_ctes(sql, dialect)
+    semantic_nodes = _get_semantic_nodes(nodes, edges)
 
-    return _to_mermaid(nodes, edges)
+    return _to_mermaid(semantic_nodes, edges)
