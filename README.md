@@ -16,10 +16,7 @@
 
 Personal SQL lineage generator.
 
-Built on the following awesome libraries:
-
-- [SQLGlot](https://github.com/tobymao/sqlglot) for SQL parsing
-- [arguably](https://github.com/treykeown/arguably) for the CLI
+Built on the awesome [SQLGlot](https://github.com/tobymao/sqlglot) library for SQL parsing.
 
 ## So... what is this? 🤔
 
@@ -98,15 +95,15 @@ graph TD
     bbb
     ccc
     ddd
-    final
+    .
     aaa --> ccc
     aaa --> ddd
     bbb --> ddd
-    ccc --> final
-    ddd --> final
+    ccc --> .
+    ddd --> .
 ```
 
-Note that the `final` node is an alias for the final `SELECT` statement since the final `SELECT` statement is not a CTE.
+Note that the `.` node represents the final `SELECT` statement since the final `SELECT` statement is not a CTE.
 
 ## Contributing
 

@@ -73,28 +73,24 @@ def main(argv: Sequence[str] | None = None) -> int:
         version=_get_version(),
     )
 
-    parser.add_argument("filenames", nargs="*")
+    parser.add_argument("filename", type=pathlib.Path)
     parser.add_argument("--target", type=pathlib.Path)
     parser.add_argument("--dialect", type=str)
 
     args = parser.parse_args(argv)
-
-    outcome = 0
-    for filename in args.filenames:
-        try:
-            generate_lineage_graph(
-                file=filename,
-                target=args.target,
-                dialect=args.dialect,
-            )
-        except Exception as err:
-            print(
-                f"error: failed to generate graph for {filename}: {err}",
-                file=sys.stderr,
-            )
-            outcome |= 1
-
-    return outcome
+    try:
+        generate_lineage_graph(
+            file=args.filename,
+            target=args.target,
+            dialect=args.dialect,
+        )
+        return 0
+    except Exception as err:
+        print(
+            f"error: failed to generate graph for {args.filename}: {err}",
+            file=sys.stderr,
+        )
+        return 1
 
 
 if __name__ == "__main__":

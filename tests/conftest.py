@@ -21,11 +21,11 @@ def mock_datetime(monkeypatch):
     monkeypatch.setattr(datetime, "datetime", MockDatetime)
 
 
-@pytest.fixture(scope="session")
-def sql_with_ctes() -> str:
-    return read_fixture("mock.sql")
-
-
-@pytest.fixture(scope="session")
-def mermaid_with_ctes() -> str:
-    return read_fixture("mock.mermaid")
+@pytest.fixture(
+    scope="session",
+    params=["mock-1", "mock-2"],
+)
+def sql_mermaid_pair(request: pytest.FixtureRequest) -> tuple[str, str]:
+    sql = read_fixture(f"{request.param}.sql")
+    mermaid = read_fixture(f"{request.param}.mermaid")
+    return sql, mermaid

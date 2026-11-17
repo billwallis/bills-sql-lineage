@@ -11,6 +11,11 @@ Nodes = list[str]
 Edges = list[tuple[str, str]]  # Directed edges, source --> target.
 
 
+
+def _qualify_table(table: exp.Table) -> str:
+    return ".".join([p.name for p in table.parts])
+
+
 def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
     """
     Parse an SQL query into nodes and edges based on CTEs.
@@ -26,12 +31,18 @@ def _parse_ctes(sql: str, dialect: str | None = None) -> tuple[Nodes, Edges]:
     # Lazy and error-prone CTE sourcing
     for cte in parsed.find_all(exp.CTE):
         nodes.append(cte.alias)
-        edges.extend((tbl.name, cte.alias) for tbl in cte.find_all(exp.Table))
+        for tbl in cte.find_all(exp.Table):
+            tbl_identifier = _qualify_table(tbl)
+            if tbl_identifier not in nodes:
+                nodes.append(tbl_identifier)
+            edges.append((tbl_identifier, cte.alias))
 
     parsed.args["with"] = None  # Dirty hack to remove the CTEs from the query
     final = "."
     nodes.append(final)
-    edges.extend((tbl.name, final) for tbl in parsed.find_all(exp.Table))
+    edges.extend(
+        (_qualify_table(tbl), final) for tbl in parsed.find_all(exp.Table)
+    )
 
     return nodes, edges
 
